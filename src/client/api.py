@@ -6,6 +6,7 @@ from proto_gen.chat import room_pb2
 from proto_gen.chat import user_pb2
 from proto_gen.chat import service_pb2
 from proto_gen.chat import service_pb2_grpc
+from google.protobuf import timestamp_pb2
 
 import db as db
 
@@ -38,10 +39,10 @@ def send_message(room_id: str, message: str) -> None:
         author_id=db.get_username(),
         room_id=room_id,
         text=message,
-        timestamp=datetime.now().isoformat()
+        timestamp=timestamp_pb2.Timestamp().FromDatetime(datetime.now())
     )
     stub.SendMessage(msg)
-    db.insert_message(msg.message_id, msg.author_id, msg.room_id, msg.text, msg.timestamp)
+    db.insert_message(msg.message_id, msg.author_id, msg.room_id, msg.text, datetime.fromtimestamp(msg.timestamp.seconds + msg.timestamp.nanos/1e9))
 
 def join_room(room_id: str, username: str = db.get_username()) -> None:
     room = stub.GetRoom(service_pb2.RoomRequest(room_id=room_id)) # TODO: search in local db

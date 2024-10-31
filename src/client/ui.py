@@ -22,6 +22,7 @@ def signup_screen(stdscr: curses.window) -> bool:
 
 # Function to draw the main menu
 def main_menu(stdscr: curses.window) -> None:
+    global run
     while True:
         stdscr.clear()
         stdscr.addstr(f"Welcome {current_user}\n")
@@ -46,9 +47,10 @@ def main_menu(stdscr: curses.window) -> None:
         if option == ord('c'):
             create_room(stdscr)
         elif option == ord('q'):
+            run = False
             break
         elif ord('0') <= option <= ord('9'):
-            enter_room(stdscr, rooms[option - ord('0')]['room_id'])
+            enter_room(stdscr, rooms[option - ord('0')])
 
 # Function to create a room
 def create_room(stdscr: curses.window) -> None:
@@ -88,8 +90,10 @@ def enter_room(stdscr: curses.window, room_id: str) -> None:
 
         # Input prompt for new message
         stdscr.addstr("\n====================\n")
-        stdscr.addstr(f"{curses.A_BOLD}/exit{curses.A_NORMAL} to exit the room\n")
-        stdscr.addstr(f"{curses.A_BOLD}/invite{curses.A_NORMAL} to invite a user to the room\n")
+        stdscr.addstr("/exit", curses.A_BOLD)
+        stdscr.addstr(" to exit the room\n")
+        stdscr.addstr("/invite", curses.A_BOLD)
+        stdscr.addstr(" to invite a user to the room\n")
         stdscr.addstr(": ")
         curses.echo()
         msg = stdscr.getstr().decode('utf-8')
