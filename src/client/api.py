@@ -13,7 +13,7 @@ import db as db
 channel = grpc.insecure_channel('localhost:3000')
 stub = service_pb2_grpc.ServiceStub(channel)
 
-def get_username() -> str:
+def get_username() -> str | None:
     result = db.get_username()
     return result if result else None
 
@@ -25,6 +25,7 @@ def get_rooms(username: str = db.get_username()) -> list:
     return [
         room for room in stub.GetUser(service_pb2.UserRequest(username=username)).room_ids
     ]
+    # TODO: update local db
 
 def create_room(room_name: str) -> None:
     stub.CreateRoom(room_pb2.Room(room_id="", name=room_name, user_ids=[get_username()]))

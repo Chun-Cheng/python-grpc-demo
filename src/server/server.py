@@ -18,14 +18,14 @@ import db as db
 
 class ServiceServicer(service_pb2_grpc.ServiceServicer):
     def CreateUser(self: Any, request: service_pb2.UserRequest, unused_context) -> empty_pb2.Empty:
-        # db.new_user(request.username, "")
-        print(f"Creating user {request.username}")
+        logging.info(f"Creating user {request.username}")
+        db.new_user(request.username, "")
         return empty_pb2.Empty()
 
     def GetUser(self: Any, request: service_pb2.UserRequest, unused_context) -> user_pb2.User:
-        # user = db.get_user(request.username)
-        print(f"Getting user {request.username}")
-        # return user_pb2.User(username=user["username"], password="", room_ids=user["rooms"])
+        logging.info(f"Getting user {request.username}")
+        user = db.get_user(request.username)
+        return user_pb2.User(username=user["username"], password="", room_ids=user["rooms"])
         return user_pb2.User(
             username="test_user_1", 
             password="", 
@@ -33,19 +33,19 @@ class ServiceServicer(service_pb2_grpc.ServiceServicer):
         )
 
     def CreateRoom(self: Any, request: room_pb2.Room, unused_context) -> empty_pb2.Empty:
-        # db.new_room(request.name, request.user_ids[0])
-        print(f"Creating room {request.name}")
+        logging.info(f"Creating room {request.name}")
+        db.new_room(request.name, request.user_ids[0])
         return empty_pb2.Empty()
     
     def JoinRoom(self: Any, request: service_pb2.JoinRoomRequest, unused_context) -> empty_pb2.Empty:
-        # db.join_room(request.user_id, request.room_id)
-        print(f"Joining room {request.room_id}")
+        logging.info(f"Joining room {request.room_id}")
+        db.join_room(request.user_id, request.room_id)
         return empty_pb2.Empty()
 
     def GetRoom(self: Any, request: service_pb2.RoomRequest, unused_context) -> room_pb2.Room:
-        # room = db.get_room(request.room_id)
-        print(f"Getting room {request.room_id}")
-        # return room_pb2.Room(room_id=room["room_id"], name=room["name"], user_ids=room["user_id"])
+        logging.info(f"Getting room {request.room_id}")
+        room = db.get_room(request.room_id)
+        return room_pb2.Room(room_id=room["room_id"], name=room["name"], user_ids=room["user_id"])
         return room_pb2.Room(
             room_id="test_room_id", 
             name="test_room", 
@@ -53,6 +53,7 @@ class ServiceServicer(service_pb2_grpc.ServiceServicer):
         )
 
     def SendMessage(self: Any, request: message_pb2.Message, unused_context) -> empty_pb2.Empty:
+        logging.info("Sending message")
         server_time = datetime.now()
         user_timestamp = request.timestamp
         user_time = datetime.fromtimestamp(user_timestamp.seconds + user_timestamp.nanos/1e9)
@@ -69,6 +70,7 @@ class ServiceServicer(service_pb2_grpc.ServiceServicer):
         # get user new messages
         while True:
             for message in db.get_user_messages(request.username):
+                logging.info(f"Sending message {message['msg_id']}")
                 yield message_pb2.Message(
                     message_id=message["msg_id"], 
                     author_id=message["author_user_id"], 

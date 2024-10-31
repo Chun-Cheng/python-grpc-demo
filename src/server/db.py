@@ -28,8 +28,8 @@ def get_user(username: str) -> dict:
     cur.execute("SELECT username, rooms FROM users WHERE username = ?", (username,))
     result = cur.fetchone()
     return {
-        "username": result[0],
-        "rooms": str_to_list(result[1])
+        "username": result[0] if result else "",
+        "rooms": str_to_list(result[1]) if result else []
     }
 
 def new_room(name: str, user_id: str) -> None:
@@ -39,13 +39,15 @@ def new_room(name: str, user_id: str) -> None:
 def join_room(user_id: str, room_id: str) -> None:
     # add room_id into users table
     cur.execute("SELECT rooms FROM users WHERE id = ?", (user_id,))
-    user_rooms = cur.fetchone()[0]
+    result = cur.fetchone()
+    user_rooms = result[0] if result else ""
     user_rooms = str_to_list(user_rooms)
     user_rooms.append(room_id)
     cur.execute("UPDATE users SET rooms = ? WHERE id = ?", (list_to_str(user_rooms), user_id))
     # add user_id into rooms table
     cur.execute("SELECT user_id FROM rooms WHERE id = ?", (room_id,))
-    room_users = cur.fetchone()[0]
+    result = cur.fetchone()
+    room_users = result[0] if result else ""
     room_users = str_to_list(room_users)
     room_users.append(user_id)
     cur.execute("UPDATE rooms SET user_id = ? WHERE id = ?", (user_id, list_to_str(room_users)))
@@ -56,9 +58,9 @@ def get_room(room_id: str) -> dict:
     cur.execute("SELECT room_id, name, user_id FROM rooms WHERE name = ?", (room_id,))
     result = cur.fetchone()
     return {
-        "room_id": result[0],
-        "name": result[1],
-        "user_id": str_to_list(result[2])
+        "room_id": result[0] if result else "",
+        "name": result[1] if result else "",
+        "user_id": str_to_list(result[2]) if result else []
     }
 
 def new_message(author_user_id: str, room_id: str, message: str, timestamp: datetime) -> None:

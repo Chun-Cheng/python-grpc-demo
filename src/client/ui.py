@@ -49,7 +49,7 @@ def main_menu(stdscr: curses.window) -> None:
         elif option == ord('q'):
             run = False
             break
-        elif ord('0') <= option <= ord('9'):
+        elif ord('0') <= option <= ord('9') and option - ord('0') < len(rooms):
             enter_room(stdscr, rooms[option - ord('0')])
 
 # Function to create a room
