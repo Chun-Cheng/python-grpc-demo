@@ -310,6 +310,17 @@ test = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "ini2toml[lite] (>=
 type = ["importlib-metadata (>=7.0.2)", "jaraco.develop (>=7.21)", "mypy (==1.12.*)", "pytest-mypy"]
 
 [[package]]
+name = "snowflake-id"
+version = "1.0.2"
+description = "The Snowflake generator done right"
+optional = false
+python-versions = "<4.0,>=3.8"
+files = [
+    {file = "snowflake_id-1.0.2-py3-none-any.whl", hash = "sha256:c3142752ed334b9d4632739a704461d13e97aa6fa71b65d5329829b4b5cc058c"},
+    {file = "snowflake_id-1.0.2.tar.gz", hash = "sha256:4a4cd49508599aaa16488311f4b9121e9ac3bac57edff3e9f71b1d79086dbfe8"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -323,4 +334,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "5cf3dbd65c3a5e86942f34269e71a8fed88e8049f47d2aab3bba286b3ea257e3"
+content-hash = "3299ff2da6e08534e6e5c52d8dd51d7ab8cb485d1983989a115266dc8ffdd5b1"
