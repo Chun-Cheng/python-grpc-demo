@@ -76,7 +76,7 @@ def main_menu(stdscr: curses.window) -> None:
         elif option == ord('s'):
             signup_screen(stdscr)
         elif ord('0') <= option <= ord('9') and option - ord('0') < len(rooms):
-            enter_room(stdscr, rooms[option - ord('0')]["name"])
+            enter_room(stdscr, rooms[option - ord('0')])
 
         time.sleep(0.1)
 
@@ -97,26 +97,26 @@ def create_room(stdscr: curses.window) -> None:
     stdscr.getch()
 
 # Function to invite user to a room
-def invite_user(stdscr: curses.window, room_name: str) -> None:
+def invite_user(stdscr: curses.window, room: dict) -> None:
     stdscr.clear()
-    stdscr.addstr(f"Invite user to {room_name}\n")
+    stdscr.addstr(f"Invite user to {room["name"]}\n")
     stdscr.addstr("Enter username to invite: ")
     curses.echo()
     username = stdscr.getstr().decode('utf-8')
     curses.noecho()
-    api.invite_user(room_name, username)
-    stdscr.addstr(f"User '{username}' invited to '{room_name}'. Press any key to go back.")
+    api.invite_user(room["room_id"], username)
+    stdscr.addstr(f"User '{username}' invited to '{room["name"]}'. Press any key to go back.")
     stdscr.getch()
 
 # Function to enter a room and send/receive messages
-def enter_room(stdscr: curses.window, room_id: str) -> None:
+def enter_room(stdscr: curses.window, room: dict) -> None:
     stdscr.nodelay(True)
     input_buffer = ""
     while True:
-        messages = db.get_messages(room_id)
+        messages = db.get_messages(room["room_id"])
 
         stdscr.clear()
-        stdscr.addstr(f"Room: {room_id}\n")
+        stdscr.addstr(f"Room: {room["name"]}\n")
         stdscr.addstr("\n")
         for message in messages[-10:]:  # Show last 10 messages
             stdscr.addstr(f"{message['author']} ({message['timestamp']})")
@@ -145,11 +145,11 @@ def enter_room(stdscr: curses.window, room_id: str) -> None:
                 break
             elif msg.lower() == '/invite':
                 stdscr.nodelay(False)
-                invite_user(stdscr, room_id)
+                invite_user(stdscr, room)
                 stdscr.nodelay(True)
             else:
                 # Add message to the room's message list
-                api.send_message(room_id, current_user, msg)
+                api.send_message(room["room_id"], current_user, msg)
         elif key == 27:  # Escape key
             stdscr.nodelay(False)
             break
