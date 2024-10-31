@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 
-con = sqlite3.connect("nori_client.db")
+con = sqlite3.connect("client.db")
 cur = con.cursor()
 
 def init_db() -> None:
