@@ -13,6 +13,7 @@ grpcio-tools = "^1.67.1"
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.13.0"
 ruff = "^0.7.1"
+protoletariat = "^3.3.2"
 
 [tool.ruff.lint]
 # default + flake8-annotations(ANN)
