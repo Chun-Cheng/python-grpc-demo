@@ -6,7 +6,7 @@ A simple chat/messaging app demo using gRPC.
 
 - Python>=3.12 installed
 - Poetry installed
-- Unix environment (it needs to use `curses` in Python)
+- Unix environment (need `curses` in Python)
 
 ## How to run
 
@@ -18,9 +18,9 @@ A simple chat/messaging app demo using gRPC.
     ```sh
     poetry shell
     ```
-3. Add `src` to Python path
+3. Add `src` to Python path (Change the path to yours)
     ```sh
-    export PYTHONPATH=$PYTHONPATH:/home/dev/message/python-grpc-demo/src
+    export PYTHONPATH=$PYTHONPATH:path/to/python-grpc-demo/src
     ```
 4. Start the server
     ```sh
