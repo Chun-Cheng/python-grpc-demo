@@ -150,8 +150,6 @@ def enter_room(stdscr: curses.window, room_id: str) -> None:
             else:
                 # Add message to the room's message list
                 api.send_message(room_id, current_user, msg)
-                # write to db
-                db.insert_message("", current_user, room_id, msg, time.strftime("%Y-%m-%d %H:%M:%S"))
         elif key == 27:  # Escape key
             stdscr.nodelay(False)
             break
