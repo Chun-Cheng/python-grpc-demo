@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package chat;
+
+import "google/protobuf/empty.proto";
+
+import "chat/message.proto";
+import "chat/room.proto";
+import "chat/user.proto";
+
+message UserRequest {
+  string username = 1;
+}
+
+message RoomRequest {
+  string room_id = 1;
+}
+
+message JoinRoomRequest {
+  string room_id = 1;
+  string user_id = 2;
+}
+
+service Service {
+
+  rpc CreateUser (UserRequest) returns (google.protobuf.Empty) {}
+  rpc GetUser (UserRequest) returns (chat.User) {}
+
+  rpc CreateRoom (chat.Room) returns (google.protobuf.Empty) {}
+  rpc JoinRoom (JoinRoomRequest) returns (google.protobuf.Empty) {}
+  rpc GetRoom (RoomRequest) returns (chat.Room) {}
+
+  rpc SendMessage (chat.Message) returns (google.protobuf.Empty) {}
+  rpc GetMessages (UserRequest) returns (stream chat.Message) {}
+}
