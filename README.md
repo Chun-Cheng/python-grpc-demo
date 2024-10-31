@@ -43,5 +43,5 @@ poetry shell
 Then, run the following command:
 
 ```sh
-python script/generate.py
+python scripts/generate.py
 ```
