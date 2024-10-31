@@ -31,18 +31,18 @@ class ServiceServicer(ServiceServicer):
     def CreateRoom(self: Any, request: Room, unused_context) -> Empty:
         logging.info(f"Create room {request.name}")
         room_id = db.generate_room_id()
-        db.new_room(room_id, request.name, request.user_ids)
+        db.new_room(room_id, request.name, request.usernames)
         return Empty()
     
     def JoinRoom(self: Any, request: JoinRoomRequest, unused_context) -> Empty:
-        logging.info(f"User {request.user_id} Joined room {request.room_id}")
-        db.join_room(request.user_id, request.room_id)
+        logging.info(f"User {request.username} Joined room {request.room_id}")
+        db.join_room(request.username, request.room_id)
         return Empty()
 
     def GetRoom(self: Any, request: RoomRequest, unused_context) -> Room:
         logging.info(f"Get room {request.room_id}")
         room = db.get_room(request.room_id)
-        return Room(room_id=room["room_id"], name=room["name"], user_ids=room["user_ids"])
+        return Room(room_id=room["room_id"], name=room["name"], usernames=room["usernames"])
 
     def SendMessage(self: Any, request: Message, unused_context) -> Empty:
         logging.info(f"Send message: user {request.author_id} in room {request.room_id} says {request.text}")
@@ -65,7 +65,7 @@ class ServiceServicer(ServiceServicer):
                 # logging.info(f"Sending message {message['msg_id']}")
                 yield Message(
                     message_id=message["msg_id"], 
-                    author_id=message["author_user_id"], 
+                    author_id=message["author_username"], 
                     room_id=message["room_id"], 
                     text=message["message"], 
                     timestamp=message["timestamp"]

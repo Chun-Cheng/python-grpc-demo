@@ -24,11 +24,11 @@ class RoomRequest(_message.Message):
         ...
 
 class JoinRoomRequest(_message.Message):
-    __slots__ = ('room_id', 'user_id')
+    __slots__ = ('room_id', 'username')
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
-    USER_ID_FIELD_NUMBER: _ClassVar[int]
+    USERNAME_FIELD_NUMBER: _ClassVar[int]
     room_id: str
-    user_id: str
+    username: str
 
-    def __init__(self, room_id: _Optional[str]=..., user_id: _Optional[str]=...) -> None:
+    def __init__(self, room_id: _Optional[str]=..., username: _Optional[str]=...) -> None:
         ...

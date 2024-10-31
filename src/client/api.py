@@ -31,18 +31,18 @@ def create_room(room_name: str, username: str) -> None:
     if not room_name.strip():
         raise ValueError("Room name cannot be empty")
     room_id = room_name.replace(" ", "-")
-    stub.CreateRoom(Room(room_id=room_id, name=room_name, user_ids=[username]))
+    stub.CreateRoom(Room(room_id=room_id, name=room_name, usernames=[username]))
 
 def invite_user(room_id: str, username: str) -> None:
     room = stub.GetRoom(RoomRequest(room_id=room_id))
-    stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, user_id=username))
+    stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, username=username))
 
 def get_room(room_id: str) -> Room:
     room = stub.GetRoom(RoomRequest(room_id=room_id))
     return {
         "room_id": room.room_id,
         "name": room.name,
-        "user_ids": room.user_ids
+        "usernames": room.usernames
     }
 
 def send_message(room_id: str, author_id: str, message: str) -> None:
@@ -60,7 +60,7 @@ def send_message(room_id: str, author_id: str, message: str) -> None:
 
 def join_room(room_id: str, username: str) -> None:
     room = stub.GetRoom(RoomRequest(room_id=room_id))
-    stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, user_id=username))
+    stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, username=username))
     db.join_room(room.room_id)
 
 async def get_new_messages(username: str) -> None:

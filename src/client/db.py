@@ -6,7 +6,7 @@ cur = con.cursor()
 
 def init_db() -> None:
     cur.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT)")
-    cur.execute("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, msg_id TEXT, author_user_id TEXT, room_id TEXT, message TEXT, timestamp TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, msg_id TEXT, author_username TEXT, room_id TEXT, message TEXT, timestamp TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS rooms (id INTEGER PRIMARY KEY, room_id TEXT)")
     con.commit()
 
@@ -26,12 +26,12 @@ def set_username(username: str) -> None:
     cur.execute("INSERT INTO users (username) VALUES (?)", (username,))
     con.commit()
 
-def insert_message(msg_id: str, author_user_id: str, room_id: str, message: str, timestamp: datetime) -> None:
-    cur.execute("INSERT INTO messages (msg_id, author_user_id, room_id, message, timestamp) VALUES (?, ?, ?, ?, ?)", (msg_id, author_user_id, room_id, message, timestamp))
+def insert_message(msg_id: str, author_username: str, room_id: str, message: str, timestamp: datetime) -> None:
+    cur.execute("INSERT INTO messages (msg_id, author_username, room_id, message, timestamp) VALUES (?, ?, ?, ?, ?)", (msg_id, author_username, room_id, message, timestamp))
     con.commit()
 
 def get_messages(room_id: str) -> list:
-    cur.execute("SELECT msg_id, author_user_id, room_id, message, timestamp FROM messages WHERE room_id = ? ORDER BY timestamp ASC", (room_id,))
+    cur.execute("SELECT msg_id, author_username, room_id, message, timestamp FROM messages WHERE room_id = ? ORDER BY timestamp ASC", (room_id,))
     return [
         {
             "msg_id": row[0],
