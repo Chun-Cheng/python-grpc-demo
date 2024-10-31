@@ -5,13 +5,13 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Optional as _Op
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Room(_message.Message):
-    __slots__ = ('room_id', 'name', 'user_ids')
+    __slots__ = ('room_id', 'name', 'usernames')
     ROOM_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    USER_IDS_FIELD_NUMBER: _ClassVar[int]
+    USERNAMES_FIELD_NUMBER: _ClassVar[int]
     room_id: str
     name: str
-    user_ids: _containers.RepeatedScalarFieldContainer[str]
+    usernames: _containers.RepeatedScalarFieldContainer[str]
 
-    def __init__(self, room_id: _Optional[str]=..., name: _Optional[str]=..., user_ids: _Optional[_Iterable[str]]=...) -> None:
+    def __init__(self, room_id: _Optional[str]=..., name: _Optional[str]=..., usernames: _Optional[_Iterable[str]]=...) -> None:
         ...

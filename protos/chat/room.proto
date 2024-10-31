@@ -5,5 +5,5 @@ package chat;
 message Room {
   string room_id = 1;
   string name = 2;
-  repeated string user_ids = 3;
+  repeated string usernames = 3;
 }
