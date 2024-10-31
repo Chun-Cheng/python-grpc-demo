@@ -11,7 +11,7 @@ def str_to_list(a_string: str) -> list:
     return a_string.split(",")
 
 
-con = sqlite3.connect('nori_server.db')
+con = sqlite3.connect('nori_server.db', check_same_thread=False)
 cur = con.cursor()
 
 def init_db() -> None:
