@@ -15,6 +15,7 @@ snowflake-id = "^1.0.2"
 mypy = "^1.13.0"
 ruff = "^0.7.1"
 protoletariat = "^3.3.2"
+types-protobuf = "^5.28.3.20241030"
 
 [tool.ruff.lint]
 # default + flake8-annotations(ANN)
