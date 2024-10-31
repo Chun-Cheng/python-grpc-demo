@@ -13,32 +13,32 @@ import db as db
 channel = grpc.insecure_channel('localhost:3000')
 stub = ServiceStub(channel)
 
-def get_username() -> str | None:
-    result = db.get_username()
-    return result if result else None
+# def get_username() -> str | None:
+#     result = db.get_username()
+#     return result if result else None
 
 def signup(username: str) -> None:
     stub.CreateUser(User(username=username, password="", room_ids=[]))
     db.set_username(username)
 
-def get_rooms(username: str = db.get_username()) -> list:
+def get_rooms(username: str) -> list:
     rooms = stub.GetUser(UserRequest(username=username)).room_ids
     db.update_rooms(rooms)
     return rooms
 
-def create_room(room_name: str) -> None:
-    stub.CreateRoom(Room(room_id="", name=room_name, user_ids=[get_username()]))
+def create_room(room_name: str, username: str) -> None:
+    stub.CreateRoom(Room(room_id=room_name.replace(" ", "-"), name=room_name, user_ids=[username]))
 
 def invite_user(room_id: str, username: str) -> None:
     room = stub.GetRoom(RoomRequest(room_id=room_id))
     stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, user_id=username))
 
-def send_message(room_id: str, message: str) -> None:
+def send_message(room_id: str, author_id: str, message: str) -> None:
     timestamp=Timestamp()
     timestamp.FromDatetime(datetime.now())
     msg = Message(
         message_id="",
-        author_id=db.get_username(),
+        author_id=author_id,
         room_id=room_id,
         text=message,
         timestamp=timestamp
@@ -46,7 +46,7 @@ def send_message(room_id: str, message: str) -> None:
     stub.SendMessage(msg)
     db.insert_message(msg.message_id, msg.author_id, msg.room_id, msg.text, datetime.fromtimestamp(msg.timestamp.seconds + msg.timestamp.nanos/1e9))
 
-def join_room(room_id: str, username: str = db.get_username()) -> None:
+def join_room(room_id: str, username: str) -> None:
     room = stub.GetRoom(RoomRequest(room_id=room_id))
     stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, user_id=username))
     db.join_room(room.room_id)
@@ -54,20 +54,3 @@ def join_room(room_id: str, username: str = db.get_username()) -> None:
 async def get_new_messages(room_id: str) -> None:
     for message in stub.GetMessages(UserRequest(username=db.get_username())):
         db.insert_message(message.message_id, message.author_id, room_id, message.text, message.timestamp)
-
-
-
-# stub.CreateUser(user_pb2.User())
-
-# user = stub.GetUser(user_pb2.User())
-
-# stub.CreateRoom(room_pb2.Room())
-
-# stub.JoinRoom(service_pb2.JoinRoomRequest())
-
-# room = stub.GetRoom(room_pb2.Room())
-
-# stub.SendMessage(message_pb2.Message())
-
-# for message in stub.GetMessages(message_pb2.Message()):
-#     pass

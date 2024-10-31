@@ -70,7 +70,7 @@ class ServiceServicer(ServiceServicer):
         # get user new messages
         while True:
             for message in db.get_user_messages(request.username):
-                logging.info(f"Sending message {message['msg_id']}")
+                # logging.info(f"Sending message {message['msg_id']}")
                 yield Message(
                     message_id=message["msg_id"], 
                     author_id=message["author_user_id"], 
