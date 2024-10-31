@@ -50,10 +50,12 @@ def main_menu(stdscr: curses.window) -> None:
         stdscr.addstr("\n")
         stdscr.addstr("Rooms\n")
         # list rooms
-        rooms = api.get_rooms(current_user)[:10]
+        room_ids = api.get_rooms(current_user)[:10]
+        # get room names
+        rooms = [api.get_room(room_id) for room_id in room_ids]
         if rooms:
             for i in range(len(rooms)):
-                stdscr.addstr(f"({i}) {rooms[i]}\n")
+                stdscr.addstr(f"({i}) {rooms[i]["name"]}\n")
         else:
             stdscr.addstr("(empty) \n")
         stdscr.addstr("\n")
@@ -74,7 +76,7 @@ def main_menu(stdscr: curses.window) -> None:
         elif option == ord('s'):
             signup_screen(stdscr)
         elif ord('0') <= option <= ord('9') and option - ord('0') < len(rooms):
-            enter_room(stdscr, rooms[option - ord('0')])
+            enter_room(stdscr, rooms[option - ord('0')]["name"])
 
         time.sleep(0.1)
 
@@ -84,8 +86,12 @@ def create_room(stdscr: curses.window) -> None:
     stdscr.addstr("Create room\n")
     stdscr.addstr("Enter room name: ")
     curses.echo()
-    room_name = stdscr.getstr().decode('utf-8')
+    room_name = stdscr.getstr().decode('utf-8').strip()
     curses.noecho()
+    if not room_name:
+        stdscr.addstr("Room name cannot be empty! Press any key to go back.")
+        stdscr.getch()
+        return
     api.create_room(room_name, current_user)
     stdscr.addstr(f"Room '{room_name}' created! Press any key to go back.")
     stdscr.getch()
@@ -119,7 +125,7 @@ def enter_room(stdscr: curses.window, room_id: str) -> None:
         # Input prompt for new message
         stdscr.addstr(f"\n{'='*30}\n")
         stdscr.addstr("/exit", curses.A_BOLD)
-        stdscr.addstr(" to exit the room\n")
+        stdscr.addstr(" or esc to exit the room\n")
         stdscr.addstr("/invite", curses.A_BOLD)
         stdscr.addstr(" to invite a user to the room\n")
         stdscr.addstr(": ")
@@ -131,10 +137,10 @@ def enter_room(stdscr: curses.window, room_id: str) -> None:
         key = stdscr.getch()
         if key == curses.ERR:
             continue
-        elif key == 10:  # Enter key
+        elif key == 10: # Enter key
             msg = input_buffer
             input_buffer = ""
-            if msg.lower() == '/exit': # TODO: add support for esc key
+            if msg.lower() == '/exit':
                 stdscr.nodelay(False)
                 break
             elif msg.lower() == '/invite':
@@ -144,7 +150,12 @@ def enter_room(stdscr: curses.window, room_id: str) -> None:
             else:
                 # Add message to the room's message list
                 api.send_message(room_id, current_user, msg)
-        elif key in (8, 127):  # Backspace key
+                # write to db
+                db.insert_message("", current_user, room_id, msg, time.strftime("%Y-%m-%d %H:%M:%S"))
+        elif key == 27:  # Escape key
+            stdscr.nodelay(False)
+            break
+        elif key == curses.KEY_BACKSPACE:  # Backspace key
             input_buffer = input_buffer[:-1]
         elif key in (curses.KEY_LEFT, curses.KEY_RIGHT, curses.KEY_UP, curses.KEY_DOWN):
             continue  # Ignore arrow keys for now

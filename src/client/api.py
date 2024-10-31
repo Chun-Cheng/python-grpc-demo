@@ -18,8 +18,9 @@ stub = ServiceStub(channel)
 #     return result if result else None
 
 def signup(username: str) -> None:
-    stub.CreateUser(User(username=username, password="", room_ids=[]))
+    stub.CreateUser(UserRequest(username=username))
     db.set_username(username)
+    db.update_rooms([])  # Initialize with an empty list of rooms
 
 def get_rooms(username: str) -> list:
     rooms = stub.GetUser(UserRequest(username=username)).room_ids
@@ -27,14 +28,25 @@ def get_rooms(username: str) -> list:
     return rooms
 
 def create_room(room_name: str, username: str) -> None:
-    stub.CreateRoom(Room(room_id=room_name.replace(" ", "-"), name=room_name, user_ids=[username]))
+    if not room_name.strip():
+        raise ValueError("Room name cannot be empty")
+    room_id = room_name.replace(" ", "-")
+    stub.CreateRoom(Room(room_id=room_id, name=room_name, user_ids=[username]))
 
 def invite_user(room_id: str, username: str) -> None:
     room = stub.GetRoom(RoomRequest(room_id=room_id))
     stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, user_id=username))
 
+def get_room(room_id: str) -> Room:
+    room = stub.GetRoom(RoomRequest(room_id=room_id))
+    return {
+        "room_id": room.room_id,
+        "name": room.name,
+        "user_ids": room.user_ids
+    }
+
 def send_message(room_id: str, author_id: str, message: str) -> None:
-    timestamp=Timestamp()
+    timestamp = Timestamp()
     timestamp.FromDatetime(datetime.now())
     msg = Message(
         message_id="",
@@ -51,6 +63,6 @@ def join_room(room_id: str, username: str) -> None:
     stub.JoinRoom(JoinRoomRequest(room_id=room.room_id, user_id=username))
     db.join_room(room.room_id)
 
-async def get_new_messages(room_id: str) -> None:
-    for message in stub.GetMessages(UserRequest(username=db.get_username())):
-        db.insert_message(message.message_id, message.author_id, room_id, message.text, message.timestamp)
+async def get_new_messages(username: str) -> None:
+    async for message in stub.GetMessages(UserRequest(username=username)):
+        db.insert_message(message.message_id, message.author_id, message.room_id, message.text, datetime.fromtimestamp(message.timestamp.seconds + message.timestamp.nanos/1e9))

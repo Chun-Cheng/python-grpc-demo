@@ -20,21 +20,18 @@ class ServiceServicer(ServiceServicer):
     def CreateUser(self: Any, request: UserRequest, unused_context) -> Empty:
         logging.info(f"Creating user {request.username}")
         db.new_user(request.username, "")
+        logging.debug(f"rooms of {request.username}: {db.get_user(request.username)["rooms"]}")
         return Empty()
 
     def GetUser(self: Any, request: UserRequest, unused_context) -> User:
         logging.info(f"Getting user {request.username}")
         user = db.get_user(request.username)
         return User(username=user["username"], password="", room_ids=user["rooms"])
-        return User(
-            username="test_user_1", 
-            password="", 
-            room_ids=["test_room"]
-        )
 
     def CreateRoom(self: Any, request: Room, unused_context) -> Empty:
         logging.info(f"Creating room {request.name}")
-        db.new_room(request.name, request.user_ids[0])
+        room_id = db.generate_room_id()
+        db.new_room(room_id, request.name, request.user_ids)
         return Empty()
     
     def JoinRoom(self: Any, request: JoinRoomRequest, unused_context) -> Empty:
@@ -45,12 +42,7 @@ class ServiceServicer(ServiceServicer):
     def GetRoom(self: Any, request: RoomRequest, unused_context) -> Room:
         logging.info(f"Getting room {request.room_id}")
         room = db.get_room(request.room_id)
-        return Room(room_id=room["room_id"], name=room["name"], user_ids=room["user_id"])
-        return Room(
-            room_id="test_room_id", 
-            name="test_room", 
-            user_ids=["test_user_1", "test_user_2"]
-        )
+        return Room(room_id=room["room_id"], name=room["name"], user_ids=room["user_ids"])
 
     def SendMessage(self: Any, request: Message, unused_context) -> Empty:
         logging.info("Sending message")
@@ -92,5 +84,5 @@ async def serve() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     asyncio.get_event_loop().run_until_complete(serve())

@@ -8,6 +8,8 @@ def list_to_str(a_list: list) -> str:
     return ",".join(a_list)
 
 def str_to_list(a_string: str) -> list:
+    if not a_string:
+        return []
     return a_string.split(",")
 
 
@@ -32,35 +34,46 @@ def get_user(username: str) -> dict:
         "rooms": str_to_list(result[1]) if result else []
     }
 
-def new_room(name: str, user_id: str) -> None:
-    cur.execute("INSERT INTO rooms (room_id, name, user_id) VALUES (?, ?, ?)", (next(id_gen), name, list_to_str([user_id])))
+def generate_room_id() -> str:
+    return str(next(id_gen))
+
+def new_room(room_id: str, name: str, user_ids: list[str]) -> None:
+    cur.execute("INSERT INTO rooms (room_id, name, user_id) VALUES (?, ?, ?)", (room_id, name, list_to_str(user_ids)))
+    # add room_id into users table
+    for user_id in user_ids:
+        cur.execute("SELECT rooms FROM users WHERE username = ?", (user_id,))
+        result = cur.fetchone()
+        user_rooms = result[0] if result else ""
+        user_rooms = str_to_list(user_rooms)
+        user_rooms.append(room_id)
+        cur.execute("UPDATE users SET rooms = ? WHERE username = ?", (list_to_str(user_rooms), user_id))
     con.commit()
 
 def join_room(user_id: str, room_id: str) -> None:
     # add room_id into users table
-    cur.execute("SELECT rooms FROM users WHERE id = ?", (user_id,))
+    cur.execute("SELECT rooms FROM users WHERE username = ?", (user_id,))
     result = cur.fetchone()
     user_rooms = result[0] if result else ""
     user_rooms = str_to_list(user_rooms)
     user_rooms.append(room_id)
-    cur.execute("UPDATE users SET rooms = ? WHERE id = ?", (list_to_str(user_rooms), user_id))
+    cur.execute("UPDATE users SET rooms = ? WHERE username = ?", (list_to_str(user_rooms), user_id))
     # add user_id into rooms table
-    cur.execute("SELECT user_id FROM rooms WHERE id = ?", (room_id,))
+    cur.execute("SELECT user_id FROM rooms WHERE room_id = ?", (room_id,))
     result = cur.fetchone()
     room_users = result[0] if result else ""
     room_users = str_to_list(room_users)
     room_users.append(user_id)
-    cur.execute("UPDATE rooms SET user_id = ? WHERE id = ?", (user_id, list_to_str(room_users)))
+    cur.execute("UPDATE rooms SET user_id = ? WHERE room_id = ?", (list_to_str(room_users), room_id))
     # commit
     con.commit()
 
 def get_room(room_id: str) -> dict:
-    cur.execute("SELECT room_id, name, user_id FROM rooms WHERE name = ?", (room_id,))
+    cur.execute("SELECT room_id, name, user_id FROM rooms WHERE room_id = ?", (room_id,))
     result = cur.fetchone()
     return {
         "room_id": result[0] if result else "",
         "name": result[1] if result else "",
-        "user_id": str_to_list(result[2]) if result else []
+        "user_ids": str_to_list(result[2]) if result else []
     }
 
 def new_message(author_user_id: str, room_id: str, message: str, timestamp: datetime) -> None:
