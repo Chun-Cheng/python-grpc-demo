@@ -44,23 +44,15 @@ def user_selection_screen(stdscr: curses.window) -> None:
 # Function to draw the main menu
 def main_menu(stdscr: curses.window) -> None:
     global run
-    time_sleep = 0.1
-    time_counter = 0
     while True:
         stdscr.clear()
         stdscr.addstr(f"Welcome {current_user}\n")
         stdscr.addstr("\n")
         stdscr.addstr("Rooms\n")
-        
-        if time_counter * time_sleep <= 0:
-            # list rooms
-            room_ids = api.get_rooms(current_user)[:10]
-            # get room names
-            rooms = [api.get_room(room_id) for room_id in room_ids]
-            # reset time counter
-            time_counter = 10
-            break
-
+        # list rooms
+        room_ids = api.get_rooms(current_user)[:10]
+        # get room names
+        rooms = [api.get_room(room_id) for room_id in room_ids]
         if rooms:
             for i in range(len(rooms)):
                 stdscr.addstr(f"({i}) {rooms[i]["name"]}\n")
@@ -85,9 +77,6 @@ def main_menu(stdscr: curses.window) -> None:
             signup_screen(stdscr)
         elif ord('0') <= option <= ord('9') and option - ord('0') < len(rooms):
             enter_room(stdscr, rooms[option - ord('0')])
-
-        time.sleep(time_sleep)
-        time_counter -= 1
 
 # Function to create a room
 def create_room(stdscr: curses.window) -> None:
