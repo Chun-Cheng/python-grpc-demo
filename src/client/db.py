@@ -15,6 +15,10 @@ def get_host() -> str:
     cur.execute("SELECT host FROM host")
     return cur.fetchone()[0]
 
+def set_host(host: str) -> None:
+    cur.execute("INSERT INTO host (host) VALUES (?)", (host,))
+    con.commit()
+
 def get_users() -> list:
     cur.execute("SELECT username FROM users")
     return [row[0] for row in cur.fetchall()]

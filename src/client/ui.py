@@ -1,10 +1,11 @@
 import curses
 import time
-import api as api
+from api import API
 import db as db
-import asyncio
 
-host = "localhost:3000"
+api = None
+
+# host = "localhost:3000"
 current_user = None
 run = True
 
@@ -19,7 +20,8 @@ def signup_screen(stdscr: curses.window) -> bool:
     host = stdscr.getstr().decode('utf-8')
     curses.noecho()
     host = host if host else "localhost:3000"
-    # TODO: save host address
+    db.set_host(host)
+    api = API()
     
     stdscr.addstr("Enter your username: ")
     curses.echo()
@@ -182,7 +184,8 @@ def main(stdscr: curses.window) -> None:
     curses.curs_set(0)
     users = db.get_users()
     if users:
-        host = db.get_host()
+        # host = db.get_host()
+        api = API()
         user_selection_screen(stdscr)
     else:
         signup_screen(stdscr)
