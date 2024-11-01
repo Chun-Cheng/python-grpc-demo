@@ -48,7 +48,7 @@ class ServiceServicer(ServiceServicer):
         logging.info(f"Send message: user {request.author_id} in room {request.room_id} says {request.text}")
         server_time = datetime.now(timezone.utc)
         user_timestamp = request.timestamp
-        user_time = datetime.fromtimestamp(user_timestamp.seconds + user_timestamp.nanos / 1e9)
+        user_time = datetime.fromtimestamp(user_timestamp.seconds + user_timestamp.nanos / 1e9, timezone.utc)
         if user_time < server_time and (server_time - user_time).total_seconds() < 0.5:
             msg_time = user_time
         else:
