@@ -2,6 +2,7 @@ import curses
 import time
 import api as api
 import db as db
+import asyncio
 
 current_user = None
 run = True
@@ -167,6 +168,7 @@ def main(stdscr: curses.window) -> None:
         user_selection_screen(stdscr)
     else:
         signup_screen(stdscr)
+    asyncio.run(api.get_new_messages(current_user))
     while run:
         main_menu(stdscr)
 

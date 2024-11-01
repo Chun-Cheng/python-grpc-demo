@@ -19,7 +19,7 @@ cur = con.cursor()
 def init_db() -> None:
     cur.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT, rooms TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS rooms (id INTEGER PRIMARY KEY, room_id TEXT, name TEXT, username TEXT)")
-    cur.execute("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, msg_id TEXT, author_username TEXT, room_id TEXT, message TEXT, timestamp TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, target_username TEXT, msg_id TEXT, author_username TEXT, room_id TEXT, message TEXT, timestamp TEXT)")
     con.commit()
 
 def new_user(username: str, password: str) -> None:
@@ -77,21 +77,23 @@ def get_room(room_id: str) -> dict:
     }
 
 def new_message(author_username: str, room_id: str, message: str, timestamp: datetime) -> None:
-    cur.execute(
-        "INSERT INTO messages (msg_id, author_username, room_id, message, timestamp) VALUES (?, ?, ?, ?, ?)", 
-        (next(id_gen), author_username, room_id, message, timestamp)
-    )
+    # get room users
+    cur.execute("SELECT username FROM rooms WHERE room_id = ?", (room_id,))
+    result = cur.fetchone()
+    room_users = str_to_list(result[0]) if result else []
+    room_users.remove(author_username)
+
+    for target_username in room_users:
+        cur.execute(
+            "INSERT INTO messages (target_username, msg_id, author_username, room_id, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", 
+            (target_username, next(id_gen), author_username, room_id, message, timestamp)
+        )
     con.commit()
 
-def get_user_messages(username: str) -> list:
-    # get rooms from users table
-    cur.execute("SELECT rooms FROM users WHERE id = ?", (username,))
-    rooms = str_to_list(cur.fetchone()[0])
-    # get messages from messages table (exclude the messages from the user)
-    cur.execute("SELECT * FROM messages WHERE room_id room_id IN ? AND author_username != ?", (tuple(rooms), username))
+def get_user_messages(target_username: str) -> list:
+    cur.execute("SELECT msg_id, author_username, room_id, message, timestamp FROM messages WHERE target_username = ?", (target_username,))
     result = cur.fetchall()
-    # turn result from list of tuple into list of dict and return
-    return [
+    messages = [
         {
             "msg_id": row[0],
             "author_username": row[1],
@@ -101,3 +103,6 @@ def get_user_messages(username: str) -> list:
         }
         for row in result
     ]
+    cur.execute("DELETE FROM messages WHERE target_username = ?", (target_username,))
+    con.commit()
+    return messages

@@ -61,8 +61,8 @@ class ServiceServicer(ServiceServicer):
     async def GetMessages(self: Any, request: UserRequest, unused_context):
         # get user new messages
         while True:
-            for message in db.get_user_messages(request.username):
-                # logging.info(f"Sending message {message['msg_id']}")
+            messages = db.get_user_messages(request.username)
+            for message in messages:
                 yield Message(
                     message_id=message["msg_id"], 
                     author_id=message["author_username"], 
