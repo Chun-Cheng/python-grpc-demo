@@ -10,14 +10,6 @@ def init_db() -> None:
     cur.execute("CREATE TABLE IF NOT EXISTS rooms (id INTEGER PRIMARY KEY, room_id TEXT)")
     con.commit()
 
-# def get_username() -> str | None:
-#     try:
-#         cur.execute("SELECT username FROM users")
-#         result = cur.fetchone()
-#         return result[0] if result else None
-#     except sqlite3.OperationalError:
-#         return None
-
 def get_users() -> list:
     cur.execute("SELECT username FROM users")
     return [row[0] for row in cur.fetchall()]

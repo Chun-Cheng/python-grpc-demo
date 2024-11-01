@@ -86,7 +86,7 @@ def new_message(author_username: str, room_id: str, message: str, timestamp: dat
     for target_username in room_users:
         cur.execute(
             "INSERT INTO messages (target_username, msg_id, author_username, room_id, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", 
-            (target_username, next(id_gen), author_username, room_id, message, timestamp)
+            (target_username, next(id_gen), author_username, room_id, message, timestamp.isoformat())
         )
     con.commit()
 
@@ -99,7 +99,7 @@ def get_user_messages(target_username: str) -> list:
             "author_username": row[1],
             "room_id": row[2],
             "message": row[3],
-            "timestamp": row[4]
+            "timestamp": datetime.fromisoformat(row[4])
         }
         for row in result
     ]

@@ -11,7 +11,7 @@ from proto_gen.chat.service_pb2 import UserRequest, RoomRequest, JoinRoomRequest
 from proto_gen.chat.service_pb2_grpc import ServiceServicer, add_ServiceServicer_to_server
 
 from google.protobuf.empty_pb2 import Empty
-# from google.protobuf.timestamp_pb2 import Timestamp
+from google.protobuf.timestamp_pb2 import Timestamp
 
 import db as db
 
@@ -49,7 +49,6 @@ class ServiceServicer(ServiceServicer):
         server_time = datetime.now()
         user_timestamp = request.timestamp
         user_time = datetime.fromtimestamp(user_timestamp.seconds + user_timestamp.nanos/1e9)
-        # compare user_time and server_time
         if user_time < server_time and (server_time - user_time).total_seconds() < 0.5:
             msg_time = user_time
         else:
@@ -59,18 +58,17 @@ class ServiceServicer(ServiceServicer):
         return Empty()
 
     async def GetMessages(self: Any, request: UserRequest, unused_context):
-        # get user new messages
-        while True:
-            messages = db.get_user_messages(request.username)
-            for message in messages:
-                yield Message(
-                    message_id=message["msg_id"], 
-                    author_id=message["author_username"], 
-                    room_id=message["room_id"], 
-                    text=message["message"], 
-                    timestamp=message["timestamp"]
-                )
-            await asyncio.sleep(0.1)
+        # while True:
+        messages = db.get_user_messages(request.username)
+        for message in messages:
+            yield Message(
+                message_id=message["msg_id"], 
+                author_id=message["author_username"], 
+                room_id=message["room_id"], 
+                text=message["message"], 
+                timestamp=Timestamp(seconds=int(message["timestamp"].timestamp()), nanos=int(message["timestamp"].microsecond * 1e3))
+            )
+        # await asyncio.sleep(0.1)
 
 
 async def serve() -> None:

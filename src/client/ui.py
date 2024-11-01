@@ -111,7 +111,14 @@ def invite_user(stdscr: curses.window, room: dict) -> None:
 def enter_room(stdscr: curses.window, room: dict) -> None:
     stdscr.nodelay(True)
     input_buffer = ""
+    # loop = asyncio.get_event_loop()
+    # loop.create_task(api.get_new_messages(current_user))
+    loop_counter = 0
     while True:
+        if loop_counter <= 0:
+            loop_counter = 10
+            api.get_new_messages(current_user)
+
         messages = db.get_messages(room["room_id"])
 
         stdscr.clear()
@@ -132,6 +139,7 @@ def enter_room(stdscr: curses.window, room: dict) -> None:
         stdscr.refresh()
 
         time.sleep(0.1)
+        loop_counter -= 1
 
         key = stdscr.getch()
         if key == curses.ERR:
@@ -168,7 +176,7 @@ def main(stdscr: curses.window) -> None:
         user_selection_screen(stdscr)
     else:
         signup_screen(stdscr)
-    asyncio.run(api.get_new_messages(current_user))
+    api.get_new_messages(current_user)
     while run:
         main_menu(stdscr)
 
