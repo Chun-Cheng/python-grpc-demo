@@ -36,9 +36,9 @@ def signup_screen(stdscr: curses.window) -> bool:
 def user_selection_screen(stdscr: curses.window) -> None:
     global current_user
     users = db.get_users()
-    if len(users) == 1:
-        current_user = users[0]
-        return
+    # if len(users) == 1:
+    #     current_user = users[0]
+    #     return
 
     stdscr.clear()
     stdscr.addstr("Select User\n")
