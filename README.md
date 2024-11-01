@@ -47,3 +47,20 @@ Then, run the following command:
 ```sh
 python scripts/generate.py
 ```
+
+## File structure
+
+```
+python-grpc-demo
+├── protos/             # Protocol Buffers definition contents
+├── scripts/            # useful commands
+│   └── generate.py     # generate Python codes from protos/
+├── src/                # source code
+│   ├── proto_gen/      # generated codes from protos/
+│   ├── client/
+│   └── server/
+├── pyproject.toml      # project and dependencies info and settings
+└── ......
+```
+
+The app use SQLite to store data. If you want to clear the data, delete `server.db` and `client.db`.
