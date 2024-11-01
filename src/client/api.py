@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import grpc
@@ -45,7 +45,7 @@ class API:
 
     def send_message(self: Any, room_id: str, author_id: str, message: str) -> None:
         timestamp = Timestamp()
-        timestamp.FromDatetime(datetime.now())
+        timestamp.FromDatetime(datetime.now(timezone.utc))
         msg = Message(
             message_id="",
             author_id=author_id,
@@ -54,8 +54,8 @@ class API:
             timestamp=timestamp
         )
         self.stub.SendMessage(msg)
-        db.insert_message(author_id, msg.message_id, msg.author_id, msg.room_id, msg.text, datetime.fromtimestamp(msg.timestamp.seconds + msg.timestamp.nanos/1e9))
+        db.insert_message(author_id, msg.message_id, msg.author_id, msg.room_id, msg.text, datetime.fromtimestamp(msg.timestamp.seconds + msg.timestamp.nanos / 1e9))
 
     def get_new_messages(self: Any, username: str) -> None:
         for message in self.stub.GetMessages(UserRequest(username=username)):
-            db.insert_message(username, message.message_id, message.author_id, message.room_id, message.text, datetime.fromtimestamp(message.timestamp.seconds + message.timestamp.nanos/1e9))
+            db.insert_message(username, message.message_id, message.author_id, message.room_id, message.text, datetime.fromtimestamp(message.timestamp.seconds + message.timestamp.nanos / 1e9))

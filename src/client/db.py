@@ -30,7 +30,7 @@ def set_username(username: str) -> None:
 def insert_message(target_username: str, msg_id: str, author_username: str, room_id: str, message: str, timestamp: datetime) -> None:
     cur.execute(
         "INSERT INTO messages (target_username, msg_id, author_username, room_id, message, timestamp) VALUES (?, ?, ?, ?, ?, ?)", 
-        (target_username, msg_id, author_username, room_id, message, timestamp)
+        (target_username, msg_id, author_username, room_id, message, timestamp.isoformat())
     )
     con.commit()
 
@@ -42,7 +42,7 @@ def get_messages(target_username: str, room_id: str) -> list:
             "author": row[1],
             "room_id": row[2],
             "text": row[3],
-            "timestamp": row[4]
+            "timestamp": datetime.fromisoformat(row[4])
         } for row in cur.fetchall()
     ]
 
