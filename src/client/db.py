@@ -5,10 +5,15 @@ con = sqlite3.connect("client.db")
 cur = con.cursor()
 
 def init_db() -> None:
+    cur.execute("CREATE TABLE IF NOT EXISTS host (id INTEGER PRIMARY KEY, host TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, msg_id TEXT, author_username TEXT, room_id TEXT, message TEXT, timestamp TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS rooms (id INTEGER PRIMARY KEY, room_id TEXT)")
     con.commit()
+
+def get_host() -> str:
+    cur.execute("SELECT host FROM host")
+    return cur.fetchone()[0]
 
 def get_users() -> list:
     cur.execute("SELECT username FROM users")

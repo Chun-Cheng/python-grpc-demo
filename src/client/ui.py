@@ -4,6 +4,7 @@ import api as api
 import db as db
 import asyncio
 
+host = "localhost:3000"
 current_user = None
 run = True
 
@@ -12,6 +13,14 @@ def signup_screen(stdscr: curses.window) -> bool:
     global current_user
     stdscr.clear()
     stdscr.addstr("Sign Up\n")
+
+    stdscr.addstr("Enter host address: (localhost:3000) ")
+    curses.echo()
+    host = stdscr.getstr().decode('utf-8')
+    curses.noecho()
+    host = host if host else "localhost:3000"
+    # TODO: save host address
+    
     stdscr.addstr("Enter your username: ")
     curses.echo()
     username = stdscr.getstr().decode('utf-8')
@@ -169,10 +178,11 @@ def enter_room(stdscr: curses.window, room: dict) -> None:
 
 # Main function to run the curses app
 def main(stdscr: curses.window) -> None:
-    global current_user
+    global host, current_user
     curses.curs_set(0)
     users = db.get_users()
     if users:
+        host = db.get_host()
         user_selection_screen(stdscr)
     else:
         signup_screen(stdscr)
