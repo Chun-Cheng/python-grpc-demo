@@ -11,7 +11,7 @@ run = True
 
 # Function to draw the sign-up screen
 def signup_screen(stdscr: curses.window) -> bool:
-    global current_user
+    global api, current_user
     stdscr.clear()
     stdscr.addstr("Sign Up\n")
 
@@ -55,7 +55,7 @@ def user_selection_screen(stdscr: curses.window) -> None:
 
 # Function to draw the main menu
 def main_menu(stdscr: curses.window) -> None:
-    global run
+    global api, run
     while True:
         stdscr.clear()
         stdscr.addstr(f"Welcome {current_user}\n")
@@ -180,7 +180,7 @@ def enter_room(stdscr: curses.window, room: dict) -> None:
 
 # Main function to run the curses app
 def main(stdscr: curses.window) -> None:
-    global host, current_user
+    global api, current_user
     curses.curs_set(0)
     users = db.get_users()
     if users:
