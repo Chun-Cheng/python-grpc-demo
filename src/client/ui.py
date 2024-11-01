@@ -130,7 +130,7 @@ def enter_room(stdscr: curses.window, room: dict) -> None:
             loop_counter = 10
             api.get_new_messages(current_user)
 
-        messages = db.get_messages(room["room_id"])
+        messages = db.get_messages(current_user, room["room_id"])
 
         stdscr.clear()
         stdscr.addstr(f"Room: {room["name"]}\n")
