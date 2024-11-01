@@ -74,7 +74,8 @@ def main_menu(stdscr: curses.window) -> None:
         stdscr.addstr("Actions\n")
         stdscr.addstr("(c) Create Room\n")
         stdscr.addstr("(q) Exit\n")
-        stdscr.addstr("(s) Sign Up New User\n")
+        # stdscr.addstr("(n) Sign Up New User\n")
+        stdscr.addstr("(s) Switch User\n")
         stdscr.addstr("\n")
         stdscr.addstr("Select an option: ")
 
@@ -85,8 +86,10 @@ def main_menu(stdscr: curses.window) -> None:
         elif option == ord('q'):
             run = False
             break
+        # elif option == ord('n'):
+        #     signup_screen(stdscr)
         elif option == ord('s'):
-            signup_screen(stdscr)
+            user_selection_screen(stdscr)
         elif ord('0') <= option <= ord('9') and option - ord('0') < len(rooms):
             enter_room(stdscr, rooms[option - ord('0')])
 
