@@ -2,6 +2,8 @@
 
 A simple chat/messaging app demo using gRPC.
 
+![demo screenshot](docs/images/image.png)
+
 ## Prerequisites
 
 - Python>=3.12 installed
