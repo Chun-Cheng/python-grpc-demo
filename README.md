@@ -18,7 +18,7 @@ A simple chat/messaging app demo using gRPC.
     ```
 2. Activate Poetry environment
     ```sh
-    poetry env activate
+    eval $(poetry env activate)
     ```
 3. Add `src` to Python path (Change the path to yours)
     ```sh
@@ -38,8 +38,8 @@ A simple chat/messaging app demo using gRPC.
 To generate a new version of protobuf code, setup the environment first:
 
 ```sh
-poetry install --with dev
-poetry env activate
+poetry install --no-root --extras dev
+eval $(poetry env activate)
 ```
 
 Then, run the following command:
